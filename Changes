@@ -1,4 +1,9 @@
+$Id: Changes,v 1.2 2002/08/08 07:26:38 ikechin Exp $
 Revision history for Perl extension Class::DBI::Pg
 
-0.01  Thu Aug  8 12:05:40 2002
-	- original version
+2002-08-08  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.01
+	* original version
+	* 0.02
+	* added SERIAL type support.

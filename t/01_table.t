@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 3;
+use Test::More tests => 5;
 
 use Class::DBI::Pg;
 use DBI;
@@ -16,18 +16,16 @@ my $dbh = DBI->connect($dsn, $user, $password, {
 
 $dbh->do(<<'SQL');
 CREATE TABLE class_dbi_pg1 (
-    id INTEGER NOT NULL PRIMARY KEY,
+    id SERIAL NOT NULL PRIMARY KEY,
     dat TEXT
 )
 SQL
 
 my $sth = $dbh->prepare(<<"SQL");
-INSERT INTO class_dbi_pg1 (id, dat) VALUES(?, ?)
+INSERT INTO class_dbi_pg1 (dat) VALUES(?)
 SQL
-my $i = 1;
 for my $dat (qw(foo bar baz)) {
-    $sth->execute($i, $dat);
-    $i++;
+    $sth->execute($dat);
 }
 $sth->finish;
  
@@ -44,6 +42,10 @@ is($obj->dat, 'bar');
 my($obj2) = Class::DBI::Pg::Test->search(dat => 'foo');
 is($obj2->id, 1);
 
+is(Class::DBI::Pg::Test->sequence, 'class_dbi_pg1_id_seq');
+my $new_obj = Class::DBI::Pg::Test->create({ dat => 'newone'});
+is($new_obj->id, 4);
+
 Class::DBI::Pg::Test->db_Main->disconnect;
 
 sub read_input {
@@ -56,6 +58,7 @@ sub read_input {
 
 END {
     if ($dbh) {
+	$dbh->do('DROP SEQUENCE class_dbi_pg1_id_seq');
 	$dbh->do('DROP TABLE class_dbi_pg1');
 	$dbh->disconnect;
     }

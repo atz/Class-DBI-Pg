@@ -1,11 +1,12 @@
 package Class::DBI::Pg;
-# $Id: Pg.pm,v 1.4 2002/08/08 04:46:33 ikechin Exp $
+# $Id: Pg.pm,v 1.11 2002/08/08 10:26:39 ikechin Exp $
 use strict;
 require Class::DBI;
 use base 'Class::DBI';
-use Carp ();
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
+
+sub _croak { require Carp; Carp::croak(@_); }
 
 sub set_up_table {
     my($class, $table) = @_;
@@ -33,16 +34,29 @@ SQL
     $sth->execute($table);
     my $columns = $sth->fetchall_arrayref;
     $sth->finish;
+
+    # find SERIAL type.
+    # nextval('"table_id_seq"'::text)
+    $sth = $dbh->prepare(<<'SQL');
+SELECT adsrc FROM pg_attrdef 
+WHERE adrelid=(SELECT oid FROM pg_class WHERE relname=?)
+SQL
+    $sth->execute($table);
+    my($nextval_str) = $sth->fetchrow_array;
+    $sth->finish;
+    my($sequence) = $nextval_str =~ m/^nextval\('"?([^"']+)"?'::text\)/;
+
     my(@cols, $primary);
     foreach my $col(@$columns) {
 	push @cols, $col->[0];
 	next unless $prinum && $col->[1] eq $prinum;
 	$primary = $col->[0]; 
     }
-    Carp::croak "$table has no primary key" unless $primary;
+    _croak("$table has no primary key") unless $primary;
     $class->table($table);
     $class->columns(Primary => $primary);
     $class->columns(All => @cols);
+    $class->sequence($sequence) if $sequence;
 }
 
 1;
@@ -65,7 +79,39 @@ Class::DBI::Pg - Class::DBI extension for Postgres
 Class::DBI::Pg automate the setup of Class::DBI columns and primary key
 for Postgres.
 
-select Postgres system catalog and find out all columns and primary key.
+select Postgres system catalog and find out all columns, primary key and
+SERIAL type column.
+
+create table.
+
+ CREATE TABLE cd (
+     id SERIAL NOT NULL PRIMARY KEY,
+     title TEXT,
+     artist TEXT,
+     release_date DATE
+ );
+
+setup your class.
+
+ package CD;
+ use strict;
+ use base qw(Class::DBI::Pg);
+
+ __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+ __PACKAGE__->set_up_table('cd');
+ 
+This is almost the same as the following way.
+
+ package CD;
+
+ use strict;
+ use base qw(Class::DBI);
+
+ __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+ __PACKAGE__->table('cd');
+ __PACKAGE__->columns(Primary => 'id');
+ __PACKAGE__->columns(All => qw(id title artist release_date));
+ __PACKAGE__->sequence('cd_id_seq');
 
 =head1 AUTHOR
 

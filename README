@@ -9,15 +9,48 @@ SYNOPSIS
       __PACKAGE__->set_up_table('film');
 
 DESCRIPTION
-    Class::DBI::Pg automate the setup of Class::DBI columns and primary key for Postgres.
+    Class::DBI::Pg automate the setup of Class::DBI columns and primary key
+    for Postgres.
 
-    select Postgres system catalog and find out all columns and primary key.
+    select Postgres system catalog and find out all columns, primary key and
+    SERIAL type column.
+
+    create table.
+
+     CREATE TABLE cd (
+         id SERIAL NOT NULL PRIMARY KEY,
+         title TEXT,
+         artist TEXT,
+         release_date DATE
+     );
+
+    setup your class.
+
+     package CD;
+     use strict;
+     use base qw(Class::DBI::Pg);
+
+     __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+     __PACKAGE__->set_up_table('cd');
+ 
+    This is almost the same as the following way.
+
+     package CD;
+
+     use strict;
+     use base qw(Class::DBI);
+
+     __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+     __PACKAGE__->table('cd');
+     __PACKAGE__->columns(Primary => 'id');
+     __PACKAGE__->columns(All => qw(id title artist release_date));
+     __PACKAGE__->sequence('cd_id_seq');
 
 AUTHOR
     IKEBE Tomohiro <ikebe@edge.co.jp>
 
-    This library is free software; you can redistribute it and/or modify it under the same
-    terms as Perl itself.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 
 SEE ALSO
     the Class::DBI manpage the Class::DBI::mysql manpage the DBD::Pg manpage
