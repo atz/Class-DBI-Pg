@@ -1,22 +1,25 @@
 package Class::DBI::Pg;
-# $Id: Pg.pm,v 1.11 2002/08/08 10:26:39 ikechin Exp $
+# $Id: Pg.pm,v 1.15 2003/09/10 07:59:34 ikebe Exp $
 use strict;
 require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub _croak { require Carp; Carp::croak(@_); }
 
 sub set_up_table {
     my($class, $table) = @_;
     my $dbh = $class->db_Main;
-
+    my $catalog = "";
+    if ($class->pg_version >= 7.3) {
+	$catalog = 'pg_catalog.';
+    }
     # find primary key
-    my $sth = $dbh->prepare(<<'SQL');
-SELECT indkey FROM pg_index
+    my $sth = $dbh->prepare(<<"SQL");
+SELECT indkey FROM ${catalog}pg_index
 WHERE indisprimary=true AND indrelid=(
-SELECT oid FROM pg_class
+SELECT oid FROM ${catalog}pg_class
 WHERE relname = ?)
 SQL
     $sth->execute($table);
@@ -24,9 +27,9 @@ SQL
     $sth->finish;
 
     # find all columns
-    $sth = $dbh->prepare(<<'SQL');
+    $sth = $dbh->prepare(<<"SQL");
 SELECT a.attname, a.attnum
-FROM pg_class c, pg_attribute a
+FROM ${catalog}pg_class c, ${catalog}pg_attribute a
 WHERE c.relname = ?
   AND a.attnum > 0 AND a.attrelid = c.oid
 ORDER BY a.attnum
@@ -37,9 +40,10 @@ SQL
 
     # find SERIAL type.
     # nextval('"table_id_seq"'::text)
-    $sth = $dbh->prepare(<<'SQL');
-SELECT adsrc FROM pg_attrdef 
-WHERE adrelid=(SELECT oid FROM pg_class WHERE relname=?)
+    $sth = $dbh->prepare(<<"SQL");
+SELECT adsrc FROM ${catalog}pg_attrdef 
+WHERE 
+adrelid=(SELECT oid FROM ${catalog}pg_class WHERE relname=?)
 SQL
     $sth->execute($table);
     my($nextval_str) = $sth->fetchrow_array;
@@ -48,6 +52,8 @@ SQL
 
     my(@cols, $primary);
     foreach my $col(@$columns) {
+	# skip dropped column.
+ 	next if $col->[0] =~ /^\.+pg\.dropped\.\d+\.+$/;
 	push @cols, $col->[0];
 	next unless $prinum && $col->[1] eq $prinum;
 	$primary = $col->[0]; 
@@ -57,6 +63,17 @@ SQL
     $class->columns(Primary => $primary);
     $class->columns(All => @cols);
     $class->sequence($sequence) if $sequence;
+}
+
+sub pg_version {
+    my $class = shift;
+    my $dbh = $class->db_Main;
+    my $sth = $dbh->prepare("SELECT version()");
+    $sth->execute;
+    my($ver_str) = $sth->fetchrow_array;
+    $sth->finish;
+    my($ver) = $ver_str =~ m/^PostgreSQL ([\d\.]{3})/;
+    return $ver;
 }
 
 1;

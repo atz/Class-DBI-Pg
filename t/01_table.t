@@ -11,7 +11,7 @@ my $password = read_input("please specify the Pg password");
 my $dsn = "dbi:Pg:dbname=$database";
     
 my $dbh = DBI->connect($dsn, $user, $password, { 
-    AutoCommit => 1
+    AutoCommit => 1, PrintError => 0, RaiseError => 1,
 });
 
 $dbh->do(<<'SQL');
@@ -42,7 +42,7 @@ is($obj->dat, 'bar');
 my($obj2) = Class::DBI::Pg::Test->search(dat => 'foo');
 is($obj2->id, 1);
 
-is(Class::DBI::Pg::Test->sequence, 'class_dbi_pg1_id_seq');
+like(Class::DBI::Pg::Test->sequence, qr/class_dbi_pg1_id_seq/);
 my $new_obj = Class::DBI::Pg::Test->create({ dat => 'newone'});
 is($new_obj->id, 4);
 
@@ -58,8 +58,12 @@ sub read_input {
 
 END {
     if ($dbh) {
-	$dbh->do('DROP SEQUENCE class_dbi_pg1_id_seq');
-	$dbh->do('DROP TABLE class_dbi_pg1');
+	eval {
+	    unless (Class::DBI::Pg::Test->pg_version >= 7.3) {
+		$dbh->do('DROP SEQUENCE class_dbi_pg1_id_seq');
+	    }
+	    $dbh->do('DROP TABLE class_dbi_pg1');
+	};
 	$dbh->disconnect;
     }
 }
