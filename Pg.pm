@@ -5,7 +5,7 @@ require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 =head1 NAME
 
@@ -103,7 +103,8 @@ SQL
     $sth->execute($table);
     my ($nextval_str) = $sth->fetchrow_array;
     $sth->finish;
-    my ($sequence) = $nextval_str =~ m/^nextval\('"?([^"']+)"?'::text\)/;
+    my ($sequence) =
+      $nextval_str ? $nextval_str =~ m/^nextval\('"?([^"']+)"?'::text\)/ : '';
 
     my ( @cols, $primary );
     foreach my $col (@$columns) {
