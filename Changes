@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.06  Wed Dec 02 18:00:00 2004
+        - support for compound primary keys (Simon Flack)
+
 0.05  Wed Dec 01 14:00:00 2004
         - no more warnings for missing sequences (Marcus Ramberg)
 

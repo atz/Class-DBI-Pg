@@ -5,7 +5,7 @@ require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 =head1 NAME
 
@@ -78,7 +78,7 @@ SELECT oid FROM ${catalog}pg_class
 WHERE relname = ?)
 SQL
     $sth->execute($table);
-    my $prinum = $sth->fetchrow_array;
+    my %prinum = map { $_ => 1 } split ' ', $sth->fetchrow_array;
     $sth->finish;
 
     # find all columns
@@ -106,18 +106,18 @@ SQL
     my ($sequence) =
       $nextval_str ? $nextval_str =~ m/^nextval\('"?([^"']+)"?'::text\)/ : '';
 
-    my ( @cols, $primary );
+    my ( @cols, @primary );
     foreach my $col (@$columns) {
 
         # skip dropped column.
         next if $col->[0] =~ /^\.+pg\.dropped\.\d+\.+$/;
         push @cols, $col->[0];
-        next unless $prinum && $col->[1] eq $prinum;
-        $primary = $col->[0];
+        next unless $prinum{ $col->[1] };
+        push @primary, $col->[0];
     }
-    _croak("$table has no primary key") unless $primary;
+    _croak("$table has no primary key") unless @primary;
     $class->table($table);
-    $class->columns( Primary => $primary );
+    $class->columns( Primary => @primary );
     $class->columns( All     => @cols );
     $class->sequence($sequence) if $sequence;
 }
