@@ -1,0 +1,24 @@
+NAME
+    Class::DBI::Pg - Class::DBI extension for Postgres
+
+SYNOPSIS
+      use strict;
+      use base qw(Class::DBI::Pg);
+
+      __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=dbname', 'user', 'password');
+      __PACKAGE__->set_up_table('film');
+
+DESCRIPTION
+    Class::DBI::Pg automate the setup of Class::DBI columns and primary key for Postgres.
+
+    select Postgres system catalog and find out all columns and primary key.
+
+AUTHOR
+    IKEBE Tomohiro <ikebe@edge.co.jp>
+
+    This library is free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO
+    the Class::DBI manpage the Class::DBI::mysql manpage the DBD::Pg manpage
+
