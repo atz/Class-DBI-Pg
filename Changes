@@ -1,16 +1,17 @@
-2003-09-10  IKEBE Tomohiro  <ikebe@edge.co.jp>
+Revision history for Perl extension Class::DBI::Pg
 
-	* 0.03
-	* treat dropped column correctly.
-	* fixed sequence test.
-	* added pg_version().
-	* fixed PREREQ_PM 
+0.04  Wed Dec 01 10:00:00 2004
+        - cleanup
 
-2002-08-08  IKEBE Tomohiro  <ikebe@edge.co.jp>
+0.03  Thu Sep 10 00:00:00 2004
+        - 0.03
+        - treat dropped column correctly.
+        - fixed sequence test.
+        - added pg_version().
+        - fixed PREREQ_PM 
 
-	* 0.01
-	* original version
-	* 0.02
-	* added SERIAL type support.
-
-$Id: Changes,v 1.6 2003/09/10 07:59:34 ikebe Exp $	
+0.02  Thu Aug 08 00:00:00 2004
+        - 0.01
+        - original version
+        - 0.02
+        - added SERIAL type support.

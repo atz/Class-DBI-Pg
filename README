@@ -47,11 +47,15 @@ DESCRIPTION
      __PACKAGE__->sequence('cd_id_seq');
 
 AUTHOR
-    IKEBE Tomohiro <ikebe@edge.co.jp>
+    Sebastian Riedel, "sri@oook.de"
 
+AUTHOR EMERITUS
+    IKEBE Tomohiro, "ikebe@edge.co.jp"
+
+LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
 SEE ALSO
-    the Class::DBI manpage the Class::DBI::mysql manpage the DBD::Pg manpage
+    Class::DBI Class::DBI::mysql DBD::Pg
 
