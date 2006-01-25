@@ -5,7 +5,7 @@ require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 =head1 NAME
 
@@ -103,8 +103,22 @@ SQL
     $sth->execute($table);
     my ($nextval_str) = $sth->fetchrow_array;
     $sth->finish;
-    my ($sequence) =
-      $nextval_str ? $nextval_str =~ m/^nextval\('"?([^"']+)"?'::text\)/ : '';
+
+    # the text representation for nextval() changed between 7.x and 8.x
+    my $sequence;
+    if ($nextval_str) {
+        if ($class->pg_version() >= 8.1) {
+            # hackish, but oh well...
+            ($sequence) = 
+                $nextval_str =~ m!^nextval\('"?([^"']+)"?'::regclass\)!i ?
+                    $1 :
+                $nextval_str =~ m!^nextval\(\("?([^"']+)"?'::text\)?::regclass\)!i ?
+                    $1 :
+                undef;
+        } else {
+            ($sequence) = $nextval_str =~ m!^nextval\('"?([^"']+)"?'::text\)!;
+        }
+    }
 
     my ( @cols, @primary );
     foreach my $col (@$columns) {
@@ -124,21 +138,27 @@ SQL
 
 sub pg_version {
     my $class = shift;
+    my %args  = @_;
+
     my $dbh   = $class->db_Main;
     my $sth   = $dbh->prepare("SELECT version()");
     $sth->execute;
     my ($ver_str) = $sth->fetchrow_array;
     $sth->finish;
-    my ($ver) = $ver_str =~ m/^PostgreSQL ([\d\.]{3})/;
+    my ($ver) = 
+        $args{full_version} ?
+            $ver_str =~ m/^PostgreSQL ([\d\.]{5})/ :
+            $ver_str =~ m/^PostgreSQL ([\d\.]{3})/;
     return $ver;
 }
 
 =head1 AUTHOR
 
-Sebastian Riedel, C<sri@oook.de>
+Daisuke Maki C<dmaki@cpan.org>
 
 =head1 AUTHOR EMERITUS
 
+Sebastian Riedel, C<sri@oook.de>
 IKEBE Tomohiro, C<ikebe@edge.co.jp>
 
 =head1 LICENSE
