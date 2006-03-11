@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.08  Sat Mar 11 17:00:00 2006
+        - Stop using _croak (#18093)
+
 0.07  Thu Jan 26 03:00:00 2006
         - work with PostgreSQL 8.1's new sequence display 
         - pg_version(full_version => 1) gets you the major, minor, micro

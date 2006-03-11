@@ -5,62 +5,7 @@ require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.07';
-
-=head1 NAME
-
-Class::DBI::Pg - Class::DBI extension for Postgres
-
-=head1 SYNOPSIS
-
-  use strict;
-  use base qw(Class::DBI::Pg);
-
-  __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=dbname', 'user', 'password');
-  __PACKAGE__->set_up_table('film');
-
-=head1 DESCRIPTION
-
-Class::DBI::Pg automate the setup of Class::DBI columns and primary key
-for Postgres.
-
-select Postgres system catalog and find out all columns, primary key and
-SERIAL type column.
-
-create table.
-
- CREATE TABLE cd (
-     id SERIAL NOT NULL PRIMARY KEY,
-     title TEXT,
-     artist TEXT,
-     release_date DATE
- );
-
-setup your class.
-
- package CD;
- use strict;
- use base qw(Class::DBI::Pg);
-
- __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
- __PACKAGE__->set_up_table('cd');
- 
-This is almost the same as the following way.
-
- package CD;
-
- use strict;
- use base qw(Class::DBI);
-
- __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
- __PACKAGE__->table('cd');
- __PACKAGE__->columns(Primary => 'id');
- __PACKAGE__->columns(All => qw(id title artist release_date));
- __PACKAGE__->sequence('cd_id_seq');
-
-=cut
-
-sub _croak { require Carp; Carp::croak(@_); }
+$VERSION = '0.08';
 
 sub set_up_table {
     my ( $class, $table ) = @_;
@@ -122,14 +67,16 @@ SQL
 
     my ( @cols, @primary );
     foreach my $col (@$columns) {
-
         # skip dropped column.
         next if $col->[0] =~ /^\.+pg\.dropped\.\d+\.+$/;
         push @cols, $col->[0];
         next unless $prinum{ $col->[1] };
         push @primary, $col->[0];
     }
-    _croak("$table has no primary key") unless @primary;
+    if (!@primary) {
+        require Carp;
+        Carp::croak("$table has no primary key");
+    }
     $class->table($table);
     $class->columns( Primary => @primary );
     $class->columns( All     => @cols );
@@ -151,6 +98,69 @@ sub pg_version {
             $ver_str =~ m/^PostgreSQL ([\d\.]{3})/;
     return $ver;
 }
+
+__END__
+
+=head1 NAME
+
+Class::DBI::Pg - Class::DBI extension for Postgres
+
+=head1 SYNOPSIS
+
+  use strict;
+  use base qw(Class::DBI::Pg);
+
+  __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=dbname', 'user', 'password');
+  __PACKAGE__->set_up_table('film');
+
+=head1 DESCRIPTION
+
+Class::DBI::Pg automate the setup of Class::DBI columns and primary key
+for Postgres.
+
+select Postgres system catalog and find out all columns, primary key and
+SERIAL type column.
+
+create table.
+
+ CREATE TABLE cd (
+     id SERIAL NOT NULL PRIMARY KEY,
+     title TEXT,
+     artist TEXT,
+     release_date DATE
+ );
+
+setup your class.
+
+ package CD;
+ use strict;
+ use base qw(Class::DBI::Pg);
+
+ __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+ __PACKAGE__->set_up_table('cd');
+ 
+This is almost the same as the following way.
+
+ package CD;
+
+ use strict;
+ use base qw(Class::DBI);
+
+ __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
+ __PACKAGE__->table('cd');
+ __PACKAGE__->columns(Primary => 'id');
+ __PACKAGE__->columns(All => qw(id title artist release_date));
+ __PACKAGE__->sequence('cd_id_seq');
+
+=head1 METHODS
+
+=head2 set_up_table TABLENAME
+
+Declares the Class::DBI class specified by TABLENAME
+
+=head2 pg_version
+
+Returns the postgres version that you are currently using.
 
 =head1 AUTHOR
 
