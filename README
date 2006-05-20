@@ -32,7 +32,7 @@ DESCRIPTION
 
      __PACKAGE__->set_db(Main => 'dbi:Pg:dbname=db', 'user', 'password');
      __PACKAGE__->set_up_table('cd');
- 
+
     This is almost the same as the following way.
 
      package CD;
@@ -46,11 +46,27 @@ DESCRIPTION
      __PACKAGE__->columns(All => qw(id title artist release_date));
      __PACKAGE__->sequence('cd_id_seq');
 
+METHODS
+  set_up_table TABLENAME HASHREF
+    Declares the Class::DBI class specified by TABLENAME. HASHREF can
+    specify options to when setting up the table.
+
+    ColumnGroup
+        You can specify the column group that you want your columns to be
+        in.
+
+           $class->set_up_table($table,  { ColumnGroup => 'Essential' });
+
+        The default is 'All'
+
+  pg_version
+    Returns the postgres version that you are currently using.
+
 AUTHOR
-    Sebastian Riedel, "sri@oook.de"
+    Daisuke Maki "dmaki@cpan.org"
 
 AUTHOR EMERITUS
-    IKEBE Tomohiro, "ikebe@edge.co.jp"
+    Sebastian Riedel, "sri@oook.de" IKEBE Tomohiro, "ikebe@edge.co.jp"
 
 LICENSE
     This library is free software; you can redistribute it and/or modify it

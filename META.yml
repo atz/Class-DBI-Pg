@@ -1,13 +1,22 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Class-DBI-Pg
-version:      0.08
-version_from: Pg.pm
-installdirs:  site
+---
+name: Class-DBI-Pg
+version: 0.08
+author:
+  - 'Daisuke Maki C<dmaki@cpan.org>'
+abstract: Class::DBI extension for Postgres
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
 requires:
-    Class::DBI:                    0.89
-    DBD::Pg:                       1.13
-    Test::More:                    0.32
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Class::DBI: '>= 0.89'
+  DBD::Pg: '>= 1.13'
+build_requires:
+  Test::More: 0
+provides:
+  Class::DBI::Pg:
+    file: lib/Class/DBI/Pg.pm
+    version: 0.08
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

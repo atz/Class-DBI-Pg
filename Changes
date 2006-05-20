@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.08_01  Sat May 20 10:00:00 2006
+        - Fix typo in the sequence detection
+        - Restructure directory structure
+
 0.08  Sat Mar 11 17:00:00 2006
         - Stop using _croak (#18093)
 

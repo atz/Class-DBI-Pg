@@ -8,7 +8,9 @@ use vars qw($VERSION);
 $VERSION = '0.08';
 
 sub set_up_table {
-    my ( $class, $table ) = @_;
+    my ( $class, $table, $opts ) = @_;
+    $opts ||= {};
+
     my $dbh     = $class->db_Main;
     my $catalog = "";
     if ( $class->pg_version >= 7.3 ) {
@@ -23,7 +25,7 @@ SELECT oid FROM ${catalog}pg_class
 WHERE relname = ?)
 SQL
     $sth->execute($table);
-    my %prinum = map { $_ => 1 } split ' ', $sth->fetchrow_array;
+    my %prinum = map { $_ => 1 } split ' ', ($sth->fetchrow_array || '');
     $sth->finish;
 
     # find all columns
@@ -57,7 +59,7 @@ SQL
             ($sequence) = 
                 $nextval_str =~ m!^nextval\('"?([^"']+)"?'::regclass\)!i ?
                     $1 :
-                $nextval_str =~ m!^nextval\(\("?([^"']+)"?'::text\)?::regclass\)!i ?
+                $nextval_str =~ m!^nextval\(\('"?([^"']+)"?'::text\)?::regclass\)!i ?
                     $1 :
                 undef;
         } else {
@@ -73,13 +75,20 @@ SQL
         next unless $prinum{ $col->[1] };
         push @primary, $col->[0];
     }
+
+    @primary = @{ $opts->{Primary} } if $opts->{Primary};
     if (!@primary) {
         require Carp;
         Carp::croak("$table has no primary key");
     }
+
+    if ($opts->{Primary} && (! $opts->{ColumnGroup} || $opts->{ColumnGroup} eq 'All')) {
+        $opts->{ColumnGroup} = 'Essential';
+    }
+
     $class->table($table);
     $class->columns( Primary => @primary );
-    $class->columns( All     => @cols );
+    $class->columns( ($opts->{ColumnGroup} || 'All')     => @cols );
     $class->sequence($sequence) if $sequence;
 }
 
@@ -154,9 +163,22 @@ This is almost the same as the following way.
 
 =head1 METHODS
 
-=head2 set_up_table TABLENAME
+=head2 set_up_table TABLENAME HASHREF
 
-Declares the Class::DBI class specified by TABLENAME
+Declares the Class::DBI class specified by TABLENAME. HASHREF can specify
+options to when setting up the table.
+
+=over 4
+
+=item ColumnGroup
+
+You can specify the column group that you want your columns to be in.
+
+   $class->set_up_table($table,  { ColumnGroup => 'Essential' });
+
+The default is 'All'
+
+=back
 
 =head2 pg_version
 
