@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.08_02  Mon May 29 15:30:00 2006
+        - Apply patches from Boris Sukholitko. Adds "Primary As Option" and
+          "Column Groups" features
+
 0.08_01  Sat May 20 10:00:00 2006
         - Fix typo in the sequence detection
         - Restructure directory structure

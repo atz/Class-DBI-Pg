@@ -178,6 +178,11 @@ You can specify the column group that you want your columns to be in.
 
 The default is 'All'
 
+=item Primary
+
+Overrides primary key setting. This can be useful when working with views
+instead of tables.
+
 =back
 
 =head2 pg_version

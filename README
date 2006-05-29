@@ -59,6 +59,10 @@ METHODS
 
         The default is 'All'
 
+    Primary
+        Overrides primary key setting. This can be useful when working with
+        views instead of tables.
+
   pg_version
     Returns the postgres version that you are currently using.
 
