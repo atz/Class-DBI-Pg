@@ -1,11 +1,17 @@
-package Class::DBI::Pg;
+# $Id: /mirror/Class-DBI-Pg/lib/Class/DBI/Pg.pm 1980 2006-07-09T18:42:00.901499Z daisuke  $
+#
+# Copyright (c)          Ikebe Tomohiro
+#                        Sebastian Riedel
+#               2006     Daisuke Maki
+# All rights reserved.
 
+package Class::DBI::Pg;
 use strict;
 require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 sub set_up_table {
     my ( $class, $table, $opts ) = @_;
@@ -209,4 +215,4 @@ L<Class::DBI> L<Class::DBI::mysql> L<DBD::Pg>
 
 =cut
 
-1;
+

@@ -1,6 +1,6 @@
 ---
 name: Class-DBI-Pg
-version: 0.08
+version: 0.09
 author:
   - 'Daisuke Maki C<dmaki@cpan.org>'
 abstract: Class::DBI extension for Postgres
@@ -15,8 +15,8 @@ build_requires:
 provides:
   Class::DBI::Pg:
     file: lib/Class/DBI/Pg.pm
-    version: 0.08
-generated_by: Module::Build version 0.28
+    version: 0.09
+generated_by: Module::Build version 0.2801
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

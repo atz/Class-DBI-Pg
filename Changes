@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.09 Mon Jul 10 03:40:00 2006
+        * "I'm doind this as I watch the World Cup Finals" release
+        - Add POD tests
+
 0.08_02  Mon May 29 15:30:00 2006
         - Apply patches from Boris Sukholitko. Adds "Primary As Option" and
           "Column Groups" features

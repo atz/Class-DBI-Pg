@@ -1,4 +1,4 @@
-# $Id: Build.PL 6 2006-05-20 01:18:11Z daisuke $
+# $Id: /mirror/Class-DBI-Pg/Build.PL 1974 2006-05-20T01:18:11.362146Z daisuke  $
 #
 # Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org>
 # All rights reserved.
