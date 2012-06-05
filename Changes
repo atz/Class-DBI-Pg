@@ -1,5 +1,9 @@
 Revision history for Perl extension Class::DBI::Pg
 
+0.09_01 Tue Jun 5 2012
+        * Note: 0.09 is in CPAN, but not indexed!
+        - Quick fix to allow module to work with modern Postgres schema.table names
+
 0.09 Mon Jul 10 03:40:00 2006
         * "I'm doind this as I watch the World Cup Finals" release
         - Add POD tests

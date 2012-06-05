@@ -11,11 +11,12 @@ require Class::DBI;
 use base 'Class::DBI';
 use vars qw($VERSION);
 
-$VERSION = '0.09';
+$VERSION = '0.09_01';  # ad hoc version to handle PG schema
 
 sub set_up_table {
     my ( $class, $table, $opts ) = @_;
     $opts ||= {};
+    $table =~ s/^public\.//;
 
     my $dbh     = $class->db_Main;
     my $catalog = "";
@@ -85,7 +86,7 @@ SQL
     @primary = @{ $opts->{Primary} } if $opts->{Primary};
     if (!@primary) {
         require Carp;
-        Carp::croak("$table has no primary key");
+        Carp::croak("TABLE $table has " . scalar(@$columns) . " columns, but no primary key");
     }
 
     if ($opts->{Primary} && (! $opts->{ColumnGroup} || $opts->{ColumnGroup} eq 'All')) {
