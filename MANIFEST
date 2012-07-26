@@ -6,6 +6,7 @@ t/00_compile.t
 t/01_table.t
 t/99-pod-coverage.t
 t/99-pod.t
-Makefile.PL
 README
 META.yml
+Makefile.PL
+META.json
